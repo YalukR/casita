@@ -1,5 +1,7 @@
 # CASITA
 
+*[Read this in English](README.md)*
+
 > Nombre sujeto a cambios.
 
 Visor de archivos astronómicos FITS (imágenes y cubos), ligero y de código abierto,
@@ -13,7 +15,7 @@ programa sigue funcionando (más lento, por streaming), no falla ni congela el e
 
 ## Estado actual
 
-🚧 **En inicio.** Este repositorio todavía no tiene código. Se está construyendo la
+**En inicio.** Este repositorio todavía no tiene código. Se está construyendo la
 Fase 1 (ver Roadmap más abajo): un visor TUI para FITS 2D en Linux.
 
 No hay binarios ni instrucciones de instalación todavía — se agregarán aquí en cuanto
