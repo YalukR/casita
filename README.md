@@ -1,104 +1,105 @@
 # CASITA
 
-*[Read this in English](README.md)*
+*[Leer esto en español](README.es.md)*
 
-> Nombre sujeto a cambios.
+> Name subject to change.
 
-Visor de archivos astronómicos FITS (imágenes y cubos), ligero y de código abierto,
-pensado para correr bien en equipos modestos — laptops de estudiantes, no estaciones
-de trabajo de investigación. Alternativa liviana a CASA Viewer / CARTA / DS9, con dos
-frentes de uso que comparten un mismo núcleo: terminal (TUI) y escritorio (GUI).
+A lightweight, open-source viewer for astronomical FITS files (images and cubes),
+built to run well on modest hardware — student laptops, not research workstations.
+A light alternative to CASA Viewer / CARTA / DS9, with two front ends sharing a
+single core: terminal (TUI) and desktop (GUI).
 
-**Principio rector:** el hardware del usuario nunca debe ser la razón por la que el
-programa no funciona. Si un archivo es demasiado grande para la RAM disponible, el
-programa sigue funcionando (más lento, por streaming), no falla ni congela el equipo.
+**Guiding principle:** the user's hardware should never be the reason the program
+doesn't work. If a file is too large for available RAM, the program keeps working
+(slower, via streaming), instead of crashing or freezing the machine.
 
-## Estado actual
+## Current status
 
-**En inicio.** Este repositorio todavía no tiene código. Se está construyendo la
-Fase 1 (ver Roadmap más abajo): un visor TUI para FITS 2D en Linux.
+**Just getting started.** This repository has no code yet. Phase 1 (see Roadmap
+below) is under construction: a TUI viewer for 2D FITS files on Linux.
 
-No hay binarios ni instrucciones de instalación todavía — se agregarán aquí en cuanto
-exista un MVP funcional.
+There are no binaries or install instructions yet — those will be added here once a
+working MVP exists.
 
-## ¿Para quién es esto?
+## Who is this for?
 
-Estudiantes universitarios (no necesariamente de astronomía) que necesitan abrir e
-inspeccionar archivos FITS para una tarea, laboratorio o proyecto, en hardware que no
-es de investigación: 4–8 GB de RAM, GPU integrada, CPU de varios años, a veces
-trabajando por SSH contra un servidor universitario igual de limitado o con conexión
-intermitente.
+University students (not necessarily astronomy majors) who need to open and inspect
+FITS files for a homework assignment, lab, or project, on hardware that isn't
+research-grade: 4-8 GB of RAM, integrated GPU, an older CPU, sometimes working over
+SSH into a university server that's just as constrained, or with an intermittent
+connection.
 
 ## Roadmap
 
-El alcance completo se dividió en fases confrontando el "alcance ideal" contra el
-tiempo real disponible. La regla para decidir qué entra en el MVP: *¿un estudiante que
-solo quiere ver una imagen 2D nota la ausencia de esto el día uno?* Si no, se pospone.
+The full scope was split into phases by weighing the "ideal scope" against the
+actual time available. The rule for deciding what belongs in the MVP: *would a
+student who just wants to view a 2D image notice this is missing on day one?* If
+not, it gets postponed.
 
-### Fase 1 — MVP real (en progreso)
-- Lectura de FITS 2D (sin cubos todavía) y parseo de header
-- Normalización de intensidad: lineal y zscale
-- 1–2 colormaps (gris + viridis)
+### Phase 1 - real MVP (in progress)
+- Reading 2D FITS files (no cubes yet) and header parsing
+- Intensity normalization: linear and zscale
+- 1-2 colormaps (grayscale + viridis)
 - Zoom / pan
-- TUI con renderizado ANSI truecolor, navegación por teclado, funcional sobre SSH
-- Lectura por streaming / memory-mapped — nunca cargar el archivo completo en RAM
-- Apertura de un archivo típico en menos de 2 segundos
-- Solo Linux
+- TUI with ANSI truecolor rendering, keyboard navigation, works over SSH
+- Streaming / memory-mapped reads - never loading the full file into RAM
+- Opening a typical file in under 2 seconds
+- Linux only
 
-### Fase 2 — primera expansión
-- GUI con Tauri (mouse, zoom con scroll, exportar PNG/JPEG)
-- Cubos 3D: navegación por rebanadas + extracción de espectro
-- Normalización log/sqrt adicional
-- Windows y macOS
-- Detección de terminal y degradación (Kitty/Sixel) en el TUI
+### Phase 2 - first expansion
+- GUI with Tauri (mouse, scroll-to-zoom, export to PNG/JPEG)
+- 3D cubes: slice navigation + spectrum extraction
+- Additional log/sqrt normalization
+- Windows and macOS
+- Terminal detection and graceful degradation (Kitty/Sixel) in the TUI
 
-### Fase 3 — mejoras posteriores (sin fecha)
-- Más colormaps
-- Manejo robusto de headers no estándar
-- Empaquetado más pulido (instaladores nativos, firmas, etc.)
+### Phase 3 - later improvements (no fixed date)
+- More colormaps
+- Robust handling of non-standard headers
+- More polished packaging (native installers, signing, etc.)
 
-### Fuera de alcance indefinidamente
-WCS (coordenadas celestes reales), formato HDF5 propietario de CARTA, calibración o
-reducción de datos, regiones/mediciones fotométricas, colaboración en tiempo real,
-integración con archivos científicos remotos, soporte de cubos rotados.
+### Out of scope indefinitely
+Real celestial coordinates (WCS), CARTA's proprietary HDF5 format, calibration or
+data reduction, hand-drawn regions/photometric measurements, real-time
+collaboration, integration with remote science archives, support for rotated cubes.
 
-## Arquitectura (planeada)
+## Architecture (planned)
 
-El núcleo (parser de FITS, normalización, colormaps, lectura por streaming) vive
-separado de la capa de renderizado desde el día uno, para que la Fase 2 (GUI en
-Tauri) pueda reusarlo sin reescribirlo:
+The core (FITS parser, normalization, colormaps, streaming reader) lives separate
+from the rendering layer from day one, so Phase 2 (Tauri GUI) can reuse it without a
+rewrite:
 
 ```
 casita/
-├── core/         # parser FITS, normalización, mmap reader — sin UI
-├── tui/          # Fase 1: interfaz de terminal (ratatui/crossterm)
-└── gui-tauri/    # Fase 2: interfaz de escritorio (aún no iniciado)
+├── core/         # FITS parser, normalization, mmap reader - no UI
+├── tui/          # Phase 1: terminal interface (ratatui/crossterm)
+└── gui-tauri/    # Phase 2: desktop interface (not started yet)
 ```
 
-## Requerimientos no funcionales
+## Non-functional requirements
 
-| Categoría | Objetivo |
+| Category | Target |
 |---|---|
-| Tamaño de instalador | GUI <50 MB · TUI (binario único) <20 MB |
-| RAM en reposo | <150 MB con un archivo mediano abierto |
-| Dependencias externas | Ninguna en tiempo de ejecución más allá del WebView del sistema (GUI) |
-| Conectividad | 100% offline |
-| Privacidad | Sin telemetría, sin cuentas, sin conexión no solicitada |
-| Licencia | GNU AGPLv3 |
+| Installer size | GUI <50 MB - TUI (single binary) <20 MB |
+| Idle RAM usage | <150 MB with a medium-sized file open |
+| External dependencies | None at runtime beyond the system WebView (GUI) |
+| Connectivity | 100% offline |
+| Privacy | No telemetry, no accounts, no unsolicited network connections |
+| License | GNU AGPLv3 |
 
-## Instalación
+## Installation
 
-_Próximamente — en cuanto exista un binario de la Fase 1._
+_Coming soon - once a Phase 1 binary exists._
 
-## Licencia
+## License
 
-[GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) — copyleft fuerte, incluye el
-caso de uso por red.
+[GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) - strong copyleft,
+including the network-use clause.
 
-## Contribuir
+## Contributing
 
-Este proyecto está en construcción activa y el proceso es parte del objetivo (portafolio
-con código limpio y documentado). Issues y PRs son bienvenidos, especialmente sobre las
-preguntas abiertas del documento de requerimientos (tamaños de archivo reales que usan
-estudiantes, terminales más comunes, si los cubos son un caso frecuente para un usuario
-no-astrónomo).
+This project is under active construction, and the process itself is part of the
+goal (a portfolio piece with clean, documented code). Issues and PRs are welcome,
+especially around the open questions from the requirements document (real file
+sizes students actually use, most common terminals, whether cubes are a frequent
+case for non-astronomer users).
