@@ -1,0 +1,9 @@
+[package]
+name = "casita-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+memmap2 = "0.9"
+byteorder = "1"
+thiserror = "2"
